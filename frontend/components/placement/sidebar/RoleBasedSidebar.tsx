@@ -41,6 +41,7 @@ export function RoleBasedSidebar() {
     { href: '/dashboard/hr', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/hr/post-job', label: 'Post Job', icon: Briefcase },
     { href: '/dashboard/hr/my-jobs', label: 'My Jobs', icon: FileText },
+    { href: '/dashboard/hr/applicants', label: 'Applicants', icon: Users },
   ];
 
   const adminLinks = [
