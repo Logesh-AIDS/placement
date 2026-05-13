@@ -115,6 +115,51 @@ export const jobsApi = {
     request<{ success: boolean; data: Job[] }>('/jobs/my', { token }),
 };
 
+// ── Profile endpoints ─────────────────────────────────────────────────────────
+export const profileApi = {
+  get: (token: string) =>
+    request<{ success: boolean; data: StudentProfile }>('/profile', { token }),
+
+  update: (token: string, data: Partial<ProfileUpdatePayload>) =>
+    request<{ success: boolean; data: StudentProfile }>('/profile', {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify(data),
+    }),
+
+  uploadPhoto: async (token: string, file: File): Promise<{ profile_photo_url: string }> => {
+    const form = new FormData();
+    form.append('photo', file);
+    const res = await fetch(`${BASE_URL}/profile/photo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    const data = await res.json() as { success: boolean; message?: string; data?: { profile_photo_url: string } };
+    if (!res.ok) throw new ApiError(res.status, (data as { message?: string }).message || 'Upload failed.');
+    return data.data!;
+  },
+
+  deletePhoto: (token: string) =>
+    request('/profile/photo', { method: 'DELETE', token }),
+
+  uploadResume: async (token: string, file: File): Promise<{ resume_url: string; resume_name: string }> => {
+    const form = new FormData();
+    form.append('resume', file);
+    const res = await fetch(`${BASE_URL}/profile/resume`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+    const data = await res.json() as { success: boolean; message?: string; data?: { resume_url: string; resume_name: string } };
+    if (!res.ok) throw new ApiError(res.status, (data as { message?: string }).message || 'Upload failed.');
+    return data.data!;
+  },
+
+  deleteResume: (token: string) =>
+    request('/profile/resume', { method: 'DELETE', token }),
+};
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type UserRole = 'student' | 'hr' | 'admin';
 export type DomainType = 'Web' | 'DSA' | 'ML';
@@ -194,4 +239,30 @@ interface JobsResponse {
   success: boolean;
   data: Job[];
   pagination: { total: number; page: number; limit: number };
+}
+
+// ── Profile types ─────────────────────────────────────────────────────────────
+export interface StudentProfile {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  domain: DomainType | null;
+  score: number;
+  status: string;
+  phone: string | null;
+  college: string | null;
+  graduation_year: string | null;
+  profile_photo_url: string | null;
+  resume_url: string | null;
+  resume_name: string | null;
+  last_login_at: string | null;
+  created_at: string;
+}
+
+export interface ProfileUpdatePayload {
+  name: string;
+  phone: string;
+  college: string;
+  graduation_year: string;
 }
