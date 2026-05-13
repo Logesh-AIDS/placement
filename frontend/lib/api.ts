@@ -82,6 +82,37 @@ export const authApi = {
 
   me: (token: string) =>
     request<{ success: boolean; data: AuthUser }>('/auth/me', { token }),
+
+  forgotPassword: (email: string) =>
+    request<{ success: boolean; message: string; resetToken?: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    request<{ success: boolean; message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    }),
+};
+
+// ── Jobs endpoints ────────────────────────────────────────────────────────────
+export const jobsApi = {
+  getAll: (token: string, domain?: string, page = 1) =>
+    request<JobsResponse>(`/jobs?page=${page}&limit=20${domain && domain !== 'all' ? `&domain=${domain}` : ''}`, { token }),
+
+  getById: (token: string, id: number) =>
+    request<{ success: boolean; data: Job }>(`/jobs/${id}`, { token }),
+
+  create: (token: string, payload: CreateJobPayload) =>
+    request<{ success: boolean; data: Job }>('/jobs', {
+      method: 'POST',
+      token,
+      body: JSON.stringify(payload),
+    }),
+
+  getMyJobs: (token: string) =>
+    request<{ success: boolean; data: Job[] }>('/jobs/my', { token }),
 };
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -126,4 +157,41 @@ interface RefreshResponse {
     refreshToken: string;
     expiresIn: string;
   };
+}
+
+// ── Job types ─────────────────────────────────────────────────────────────────
+export interface Job {
+  id: number;
+  title: string;
+  role: string;
+  domain: DomainType;
+  min_score: number;
+  description: string;
+  requirements: string | null;
+  location: string | null;
+  salary_range: string | null;
+  hr_id: number;
+  hr_name: string;
+  hr_email: string;
+  is_active: boolean;
+  application_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateJobPayload {
+  title: string;
+  role: string;
+  domain: DomainType;
+  min_score: number;
+  description: string;
+  requirements?: string;
+  location?: string;
+  salary_range?: string;
+}
+
+interface JobsResponse {
+  success: boolean;
+  data: Job[];
+  pagination: { total: number; page: number; limit: number };
 }

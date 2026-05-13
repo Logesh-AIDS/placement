@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,196 +13,174 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/components/providers/AuthContext';
+import { jobsApi, ApiError, type DomainType } from '@/lib/api';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function PostJobPage() {
-  const { toast } = useToast();
-  const router = useRouter();
+  const { toast }       = useToast();
+  const router          = useRouter();
+  const { accessToken } = useAuth();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError]               = useState('');
+
   const [formData, setFormData] = useState({
-    title: '',
-    domain: 'Web',
-    description: '',
+    title:        '',
+    role:         '',
+    domain:       'Web' as DomainType,
+    description:  '',
     requirements: '',
-    minScore: '700',
-    positions: '1',
+    min_score:    '60',
+    location:     '',
+    salary_range: '',
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleDomainChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      domain: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!accessToken) return;
+
+    setError('');
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: 'Job Posted Successfully',
-        description: `"${formData.title}" has been posted and is now visible to students.`,
+    try {
+      await jobsApi.create(accessToken, {
+        title:        formData.title,
+        role:         formData.role || formData.title,
+        domain:       formData.domain,
+        min_score:    Number(formData.min_score),
+        description:  formData.description,
+        requirements: formData.requirements || undefined,
+        location:     formData.location     || undefined,
+        salary_range: formData.salary_range || undefined,
       });
-      setIsSubmitting(false);
+
+      toast({
+        title: 'Job posted!',
+        description: `"${formData.title}" is now live and visible to students.`,
+      });
+
       router.push('/dashboard/hr/my-jobs');
-    }, 500);
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : 'Failed to post job. Please try again.';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Post a New Job
-        </h1>
-        <p className="text-muted-foreground">
-          Create a job opening to attract qualified candidates
+        <h1 className="text-3xl font-bold text-foreground">Post a New Job</h1>
+        <p className="text-muted-foreground mt-1">
+          Fill in the details — the job will appear immediately for eligible students
         </p>
       </div>
 
       <Card>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Job Details */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground">Job Details</h3>
-              <div className="space-y-2">
-                <Label htmlFor="title">Job Title *</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  placeholder="e.g., Senior Frontend Developer"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
+
+            {/* ── Job Details ─────────────────────────────────────────────── */}
+            <section className="space-y-4">
+              <h3 className="font-semibold text-foreground border-b pb-2">Job Details</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="title">Job Title *</Label>
+                  <Input id="title" name="title" placeholder="e.g. Senior Frontend Developer"
+                    value={formData.title} onChange={handleChange} required disabled={isSubmitting} />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="domain">Domain *</Label>
-                  <Select value={formData.domain} onValueChange={handleDomainChange}>
-                    <SelectTrigger id="domain" disabled={isSubmitting}>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <Select value={formData.domain}
+                    onValueChange={(v) => setFormData((p) => ({ ...p, domain: v as DomainType }))}
+                    disabled={isSubmitting}>
+                    <SelectTrigger id="domain"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Web">Web Development</SelectItem>
                       <SelectItem value="DSA">Data Structures & Algorithms</SelectItem>
                       <SelectItem value="ML">Machine Learning</SelectItem>
-                      <SelectItem value="Cloud">Cloud Computing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="positions">Number of Positions *</Label>
-                  <Input
-                    id="positions"
-                    name="positions"
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={formData.positions}
-                    onChange={handleChange}
-                    required
-                    disabled={isSubmitting}
-                  />
+                  <Label htmlFor="min_score">Minimum Score (0–100) *</Label>
+                  <Input id="min_score" name="min_score" type="number" min="0" max="100"
+                    value={formData.min_score} onChange={handleChange} required disabled={isSubmitting} />
+                  <p className="text-xs text-muted-foreground">
+                    Only students with this score or higher can apply
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input id="location" name="location" placeholder="e.g. Bangalore / Remote"
+                    value={formData.location} onChange={handleChange} disabled={isSubmitting} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="salary_range">Salary Range</Label>
+                  <Input id="salary_range" name="salary_range" placeholder="e.g. ₹8–12 LPA"
+                    value={formData.salary_range} onChange={handleChange} disabled={isSubmitting} />
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Requirements */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground">Requirements</h3>
+            {/* ── Description ─────────────────────────────────────────────── */}
+            <section className="space-y-4">
+              <h3 className="font-semibold text-foreground border-b pb-2">Description</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="minScore">Minimum Score *</Label>
-                <Input
-                  id="minScore"
-                  name="minScore"
-                  type="number"
-                  min="0"
-                  max="1000"
-                  value={formData.minScore}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Only students with this score or higher can apply
-                </p>
+                <Label htmlFor="description">Job Description *</Label>
+                <Textarea id="description" name="description" rows={5}
+                  placeholder="Describe the role, responsibilities and what the ideal candidate looks like..."
+                  value={formData.description} onChange={handleChange} required disabled={isSubmitting} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="requirements">Required Skills & Qualifications *</Label>
-                <Textarea
-                  id="requirements"
-                  name="requirements"
-                  placeholder="List the key skills and qualifications needed..."
-                  value={formData.requirements}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                  rows={4}
-                />
+                <Label htmlFor="requirements">Required Skills & Qualifications</Label>
+                <Textarea id="requirements" name="requirements" rows={3}
+                  placeholder="e.g. React, Node.js, 1+ year experience..."
+                  value={formData.requirements} onChange={handleChange} disabled={isSubmitting} />
               </div>
-            </div>
+            </section>
 
-            {/* Description */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground">Job Description</h3>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Provide a detailed description of the job, responsibilities, and what the ideal candidate looks like..."
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                  rows={6}
-                />
-              </div>
-            </div>
+            {/* Error */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-            {/* Info Alert */}
+            {/* Info */}
             <Alert>
-              <AlertCircle className="h-4 w-4" />
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription>
-                Once posted, this job will be visible to all students meeting the minimum score requirement.
+                Once posted, this job will appear immediately at the top of the student jobs list.
               </AlertDescription>
             </Alert>
 
-            {/* Submit */}
+            {/* Actions */}
             <div className="flex gap-3">
-              <Button
-                type="submit"
-                disabled={isSubmitting || !formData.title || !formData.description}
-              >
+              <Button type="submit"
+                disabled={isSubmitting || !formData.title || !formData.description}>
                 {isSubmitting ? 'Posting...' : 'Post Job'}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isSubmitting}
-              >
+              <Button type="button" variant="outline"
+                onClick={() => router.back()} disabled={isSubmitting}>
                 Cancel
               </Button>
             </div>
