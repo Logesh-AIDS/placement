@@ -115,6 +115,32 @@ export const jobsApi = {
     request<{ success: boolean; data: Job[] }>('/jobs/my', { token }),
 };
 
+// ── Settings endpoints ────────────────────────────────────────────────────────
+export const settingsApi = {
+  get: (token: string) =>
+    request<{ success: boolean; data: Record<string, string> }>('/settings', { token }),
+
+  update: (token: string, payload: { passing_score?: number }) =>
+    request<{ success: boolean; data: Record<string, string> }>('/settings', {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify(payload),
+    }),
+};
+
+// ── Applications endpoints ────────────────────────────────────────────────────
+export const applicationsApi = {
+  apply: (token: string, job_id: number, cover_letter?: string) =>
+    request<{ success: boolean; data: Application }>('/applications', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ job_id, cover_letter }),
+    }),
+
+  getMy: (token: string) =>
+    request<{ success: boolean; data: Application[] }>('/applications/my', { token }),
+};
+
 // ── Profile endpoints ─────────────────────────────────────────────────────────
 export const profileApi = {
   get: (token: string) =>
@@ -265,4 +291,20 @@ export interface ProfileUpdatePayload {
   phone: string;
   college: string;
   graduation_year: string;
+}
+
+// ── Application type ──────────────────────────────────────────────────────────
+export interface Application {
+  id: number;
+  student_id: number;
+  job_id: number;
+  status: 'applied' | 'shortlisted' | 'rejected';
+  cover_letter: string | null;
+  applied_at: string;
+  updated_at: string;
+  // joined fields from GET /applications/my
+  job_title?: string;
+  job_role?: string;
+  domain?: string;
+  location?: string;
 }

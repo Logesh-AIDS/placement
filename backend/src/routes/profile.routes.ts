@@ -7,6 +7,7 @@ import {
   deleteProfilePhoto,
   uploadResume,
   deleteResume,
+  getStudentProfile,
 } from '../controllers/profile.controller';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validate.middleware';
@@ -22,6 +23,9 @@ router.use(authenticate);
 
 // ── Text profile ──────────────────────────────────────────────────────────────
 router.get('/', getProfile);
+
+// HR/admin view a specific student's profile (photo + resume visible)
+router.get('/student/:id', authorize('hr', 'admin'), getStudentProfile);
 
 router.patch(
   '/',

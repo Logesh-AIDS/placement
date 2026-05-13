@@ -6,7 +6,7 @@ import { createError } from '../middleware/error.middleware';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 
-// ── GET /api/profile  — load full profile ─────────────────────────────────────
+// ── GET /api/profile  — load own profile ─────────────────────────────────────
 export const getProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await query(
@@ -154,3 +154,28 @@ function deleteFileFromUrl(url: string, subdir: 'photos' | 'resumes'): void {
     console.warn('[Profile] Could not delete old file:', url);
   }
 }
+
+// ── GET /api/profile/student/:id  — HR/admin view a student's profile ────────
+export const getStudentProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    // Only HR and admin can view other students' profiles
+    if (!['hr', 'admin'].includes(req.user!.role)) {
+      return next(createError('Access denied.', 403));
+    }
+
+    const result = await query(
+      `SELECT id, name, email, domain, score, status,
+              phone, college, graduation_year,
+              profile_photo_url, resume_url, resume_name,
+              created_at
+       FROM users WHERE id = $1 AND role = 'student'`,
+      [req.params.id]
+    );
+
+    if (!result.rows[0]) return next(createError('Student not found.', 404));
+
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+};

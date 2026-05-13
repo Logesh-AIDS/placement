@@ -1,20 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/components/providers/AuthContext';
+import { settingsApi, ApiError } from '@/lib/api';
+import { Plus, Trash2, AlertCircle, Settings2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 
@@ -28,11 +26,45 @@ interface Question {
 
 export default function CreateTestPage() {
   const { toast } = useToast();
+  const { accessToken } = useAuth();
   const [testName, setTestName] = useState('');
   const [domain, setDomain] = useState('Web');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ── Passing score setting ─────────────────────────────────────────────────
+  const [passingScore, setPassingScore]     = useState('50');
+  const [isSavingScore, setIsSavingScore]   = useState(false);
+  const [scoreLoaded, setScoreLoaded]       = useState(false);
+
+  const loadSettings = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const res = await settingsApi.get(accessToken);
+      setPassingScore(res.data.passing_score ?? '50');
+      setScoreLoaded(true);
+    } catch { setScoreLoaded(true); }
+  }, [accessToken]);
+
+  useEffect(() => { loadSettings(); }, [loadSettings]);
+
+  const handleSavePassingScore = async () => {
+    if (!accessToken) return;
+    const val = Number(passingScore);
+    if (isNaN(val) || val < 0 || val > 100) {
+      toast({ title: 'Invalid score', description: 'Must be 0–100.', variant: 'destructive' }); return;
+    }
+    setIsSavingScore(true);
+    try {
+      await settingsApi.update(accessToken, { passing_score: val });
+      toast({ title: 'Passing score updated', description: `Students now need ${val}/100 to access jobs.` });
+    } catch (err) {
+      toast({ title: 'Failed', description: err instanceof ApiError ? err.message : 'Try again.', variant: 'destructive' });
+    } finally {
+      setIsSavingScore(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     question: '',
@@ -157,6 +189,42 @@ export default function CreateTestPage() {
           Build a new assessment test for students
         </p>
       </div>
+
+      {/* ── Passing Score Setting ─────────────────────────────────────────── */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Settings2 className="w-5 h-5 text-primary" />
+            <CardTitle className="text-base">Assessment Passing Score</CardTitle>
+          </div>
+          <CardDescription>
+            Students must score at or above this threshold to unlock Jobs and Applications pages.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end gap-3">
+            <div className="space-y-2 flex-1 max-w-xs">
+              <Label htmlFor="passingScore">Passing Score (0–100)</Label>
+              <Input
+                id="passingScore"
+                type="number"
+                min="0"
+                max="100"
+                value={passingScore}
+                onChange={(e) => setPassingScore(e.target.value)}
+                disabled={!scoreLoaded || isSavingScore}
+                placeholder="e.g. 50"
+              />
+            </div>
+            <Button onClick={handleSavePassingScore} disabled={!scoreLoaded || isSavingScore}>
+              {isSavingScore ? 'Saving…' : 'Save'}
+            </Button>
+            <p className="text-xs text-muted-foreground pb-1">
+              Current: <span className="font-semibold text-foreground">{passingScore}/100</span>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Question Editor */}

@@ -6,23 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/components/providers/AuthContext';
-import { jobsApi, type Job, ApiError } from '@/lib/api';
+import { jobsApi, applicationsApi, type Job, ApiError } from '@/lib/api';
+import { AssessmentGate } from '@/components/placement/shared/AssessmentGate';
 import {
-  Search,
-  Briefcase,
-  MapPin,
-  Users,
-  Clock,
-  Star,
-  Building2,
-  RefreshCw,
+  Search, Briefcase, MapPin, Users, Clock, Star, Building2, RefreshCw,
 } from 'lucide-react';
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -80,9 +70,14 @@ export default function JobsPage() {
     (j.location ?? '').toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleApply = (jobId: number) => {
-    setAppliedIds((prev) => new Set([...prev, jobId]));
-    // TODO: call applicationsApi.apply(accessToken, jobId)
+  const handleApply = async (jobId: number) => {
+    if (!accessToken) return;
+    try {
+      await applicationsApi.apply(accessToken, jobId);
+      setAppliedIds((prev) => new Set([...prev, jobId]));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to apply.');
+    }
   };
 
   const canApply = (job: Job) =>
@@ -90,6 +85,7 @@ export default function JobsPage() {
     user.domain === job.domain;
 
   return (
+    <AssessmentGate>
     <div className="p-6 md:p-8 space-y-6 max-w-6xl mx-auto">
 
       {/* Header */}
@@ -264,5 +260,6 @@ export default function JobsPage() {
         )
       )}
     </div>
+    </AssessmentGate>
   );
 }
