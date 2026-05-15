@@ -60,6 +60,8 @@ export const uploadProfilePhoto = async (req: Request, res: Response, next: Next
   try {
     if (!req.file) return next(createError('No photo file provided.', 400));
 
+    // Remove query parameter - it can cause CORS issues and isn't needed
+    // The browser will cache-bust naturally when the filename changes
     const photoUrl = `${BASE_URL}/uploads/photos/${req.file.filename}`;
 
     // Delete old photo file if it exists
@@ -146,7 +148,9 @@ export const deleteResume = async (req: Request, res: Response, next: NextFuncti
 // ── Helper ────────────────────────────────────────────────────────────────────
 function deleteFileFromUrl(url: string, subdir: 'photos' | 'resumes'): void {
   try {
-    const filename = path.basename(url);
+    // Extract filename, removing any query parameters
+    const urlWithoutQuery = url.split('?')[0];
+    const filename = path.basename(urlWithoutQuery);
     const filepath = path.join(process.cwd(), 'uploads', subdir, filename);
     if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
   } catch {

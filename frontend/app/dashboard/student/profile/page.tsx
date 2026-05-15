@@ -116,8 +116,8 @@ export default function ProfilePage() {
     setIsUploadingPhoto(true);
     try {
       const data = await profileApi.uploadPhoto(accessToken, file);
-      setProfile((p) => p ? { ...p, profile_photo_url: data.profile_photo_url } : p);
-      setPhotoError(false);
+      // Force reload the entire profile to ensure we get the latest data
+      await loadProfile();
       setPhotoJustUploaded(true);
       setTimeout(() => setPhotoJustUploaded(false), 2500);
     } catch (err) {
@@ -159,7 +159,8 @@ export default function ProfilePage() {
     setShowResumePreview(false);
     try {
       const data = await profileApi.uploadResume(accessToken, file);
-      setProfile((p) => p ? { ...p, resume_url: data.resume_url, resume_name: data.resume_name } : p);
+      // Force reload the entire profile to ensure we get the latest data
+      await loadProfile();
       setResumeJustUploaded(true);
       // Show success for 2.5 s, then auto-open preview
       setTimeout(() => {

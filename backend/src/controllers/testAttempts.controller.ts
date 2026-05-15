@@ -51,11 +51,17 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
     );
     if (!attempt.rows[0]) return next(createError('Attempt not found or already submitted.', 404));
 
-    // Fetch correct answers
-    const questions = await query(
-      'SELECT id, correct_answer, marks FROM questions WHERE test_id = $1',
-      [attempt.rows[0].test_id]
-    );
+    // Fetch correct answers and test details
+    const [questions, testDetails] = await Promise.all([
+      query(
+        'SELECT id, correct_answer, marks FROM questions WHERE test_id = $1',
+        [attempt.rows[0].test_id]
+      ),
+      query(
+        'SELECT passing_marks FROM tests WHERE id = $1',
+        [attempt.rows[0].test_id]
+      ),
+    ]);
 
     // Calculate score
     let score = 0;
@@ -65,6 +71,11 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
       }
     }
 
+    const totalMarks = attempt.rows[0].total_marks;
+    const percentage = Math.round((score / totalMarks) * 100);
+    const passingMarks = testDetails.rows[0]?.passing_marks || 0;
+
+    // Update test attempt with score and completion time
     const result = await query(
       `UPDATE test_attempts
        SET score = $1, completed_at = CURRENT_TIMESTAMP
@@ -73,10 +84,28 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
       [score, req.params.id]
     );
 
+    // CRITICAL FIX: Explicitly update user's score and status
+    // This ensures the score is updated even if the database trigger fails
+    const status = percentage >= 80 ? 'qualified' : percentage >= 50 ? 'partial' : 'not_qualified';
+    
+    await query(
+      `UPDATE users
+       SET score = $1, status = $2
+       WHERE id = $3`,
+      [score, status, student_id]
+    );
+
+    // Add calculated fields to response
+    const attemptResult = {
+      ...result.rows[0],
+      percentage,
+      passing_marks: passingMarks,
+    };
+
     res.status(200).json({
       success: true,
       message: 'Test submitted.',
-      data: result.rows[0],
+      data: attemptResult,
     });
   } catch (err) {
     next(err);

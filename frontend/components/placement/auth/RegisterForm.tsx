@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,13 @@ export function RegisterForm() {
   const { register, user } = useAuth();
   const router = useRouter();
 
+  // Redirect after user is set in context (must be in useEffect, not during render)
+  useEffect(() => {
+    if (user) {
+      router.push(`/dashboard/${user.role}`);
+    }
+  }, [user, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -57,7 +64,7 @@ export function RegisterForm() {
 
     try {
       await register(name, email, password, role, role === 'student' ? domain : undefined);
-      // register() sets user in context — redirect handled below
+      // register() sets user in context — useEffect will handle redirect
     } catch (err) {
       console.error('[Register] error:', err);
       if (err instanceof ApiError) {
@@ -72,10 +79,15 @@ export function RegisterForm() {
     }
   };
 
-  // Redirect after user is set in context
+  // Show loading state while redirecting
   if (user) {
-    router.push(`/dashboard/${user.role}`);
-    return null;
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="pt-6 pb-6 text-center">
+          <p className="text-muted-foreground">Redirecting to dashboard...</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

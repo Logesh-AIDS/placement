@@ -1,0 +1,20 @@
+
+> placement-portal-backend@1.0.0 dev
+> ts-node-dev --respawn --transpile-only src/server.ts
+
+[INFO] 09:50:39 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+(node:82787) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[0mGET /health [32m200[0m 1.303 ms - 61[0m
+[0mHEAD /uploads/resumes/resume_2_1778665937729.pdf [32m200[0m 0.666 ms - 401929[0m
+[0mHEAD /uploads/resumes/resume_2_1778665937729.pdf [32m200[0m 0.227 ms - 401929[0m

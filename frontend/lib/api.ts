@@ -141,6 +141,35 @@ export const applicationsApi = {
     request<{ success: boolean; data: Application[] }>('/applications/my', { token }),
 };
 
+// ── Tests endpoints ───────────────────────────────────────────────────────────
+export const testsApi = {
+  getAll: (token: string, domain?: string) =>
+    request<{ success: boolean; data: TestMeta[] }>(
+      `/tests${domain ? `?domain=${domain}` : ''}`,
+      { token }
+    ),
+
+  getById: (token: string, id: number) =>
+    request<{ success: boolean; data: TestWithQuestions }>(`/tests/${id}`, { token }),
+
+  startAttempt: (token: string, test_id: number) =>
+    request<{ success: boolean; data: { id: number } }>('/test-attempts/start', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ test_id }),
+    }),
+
+  submitAttempt: (token: string, attemptId: number, answers: Record<number, string>) =>
+    request<{ success: boolean; data: AttemptResult }>(`/test-attempts/${attemptId}/submit`, {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ answers }),
+    }),
+
+  getMyAttempts: (token: string) =>
+    request<{ success: boolean; data: AttemptResult[] }>('/test-attempts/my', { token }),
+};
+
 // ── Profile endpoints ─────────────────────────────────────────────────────────
 export const profileApi = {
   get: (token: string) =>
@@ -307,4 +336,44 @@ export interface Application {
   job_role?: string;
   domain?: string;
   location?: string;
+}
+
+// ── Test types ────────────────────────────────────────────────────────────────
+export interface TestMeta {
+  id: number;
+  title: string;
+  domain: DomainType;
+  description: string | null;
+  duration_minutes: number;
+  total_marks: number;
+  passing_marks: number;
+  is_active: boolean;
+  created_by_name: string;
+}
+
+export interface TestQuestion {
+  id: number;
+  test_id: number;
+  question_text: string;
+  options: string[];
+  marks: number;
+  // correct_answer is omitted for students
+}
+
+export interface TestWithQuestions extends TestMeta {
+  questions: TestQuestion[];
+}
+
+export interface AttemptResult {
+  id: number;
+  student_id: number;
+  test_id: number;
+  score: number;
+  total_marks: number;
+  percentage: number;
+  started_at: string;
+  completed_at: string | null;
+  test_title?: string;
+  domain?: string;
+  passing_marks?: number;
 }

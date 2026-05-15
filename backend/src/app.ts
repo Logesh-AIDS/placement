@@ -20,9 +20,7 @@ dotenv.config();
 
 const app = express();
 
-// ── Security ──────────────────────────────────────────────────────────────────
-app.use(helmet());
-
+// ── CORS must come BEFORE helmet ─────────────────────────────────────────────
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -31,6 +29,31 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
+// ── Security ──────────────────────────────────────────────────────────────────
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: false, // Don't use helmet's defaults, use our custom directives
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", "https:", "data:"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'", CLIENT_URL], // ← Allow frontend to embed backend PDFs
+      frameSrc: ["'self'", "blob:"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      objectSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'none'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 // General API limiter — generous for normal usage
@@ -70,7 +93,30 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ── Static file serving (uploaded photos & resumes) ──────────────────────────
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Serve with proper cache headers and CORS
+app.use('/uploads', (req, res, next) => {
+  // Set CORS headers for uploaded files
+  res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  
+  // Remove X-Frame-Options to let CSP frameAncestors handle it
+  res.removeHeader('X-Frame-Options');
+  
+  // FORCE NO CACHE for development (to prevent CSP caching issues)
+  // In production, you can change this to: 'public, max-age=3600'
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
+  // For PDFs, set proper content type and allow inline display
+  if (req.path.endsWith('.pdf')) {
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+  }
+  
+  next();
+}, express.static(path.join(process.cwd(), 'uploads')));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

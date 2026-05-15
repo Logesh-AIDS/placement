@@ -23,6 +23,7 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -131,15 +132,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async (): Promise<void> => {
     const storedRefresh = localStorage.getItem(REFRESH_TOKEN_KEY);
     if (storedRefresh) {
-      // Best-effort — don't block logout if the request fails
       authApi.logout(storedRefresh).catch(() => {});
     }
     clearSession();
   };
 
+  // ── Refresh user data (e.g. after test submission updates score) ──────────────
+  const refreshUser = async (): Promise<void> => {
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    if (!token) return;
+    try {
+      const res = await authApi.me(token);
+      setUser(res.data);
+      localStorage.setItem(USER_KEY, JSON.stringify(res.data));
+    } catch {
+      // silently fail — user data will refresh on next login
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isLoading, login, register, logout, refreshSession }}
+      value={{ user, accessToken, isLoading, login, register, logout, refreshSession, refreshUser }}
     >
       {children}
     </AuthContext.Provider>
