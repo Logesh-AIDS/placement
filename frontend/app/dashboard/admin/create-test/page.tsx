@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/components/providers/AuthContext';
 import { settingsApi, ApiError } from '@/lib/api';
+import { testsService, getDataModeInfo } from '@/lib/services';
 import { Plus, Trash2, AlertCircle, Settings2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,9 @@ export default function CreateTestPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get data mode info for display
+  const dataMode = getDataModeInfo();
 
   // ── Passing score setting ─────────────────────────────────────────────────
   const [passingScore, setPassingScore]     = useState('50');
@@ -145,7 +149,7 @@ export default function CreateTestPage() {
     }
   };
 
-  const handleSubmitTest = (e: React.FormEvent) => {
+  const handleSubmitTest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!testName || questions.length === 0) {
       toast({
@@ -156,31 +160,80 @@ export default function CreateTestPage() {
       return;
     }
 
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    if (!accessToken) {
       toast({
-        title: 'Test Created Successfully',
-        description: `"${testName}" has been created with ${questions.length} questions.`,
+        title: 'Error',
+        description: 'You must be logged in to create a test',
+        variant: 'destructive',
       });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Prepare test data for API
+      const testData = {
+        name: testName,
+        domain: domain as 'Web' | 'ML' | 'DSA',
+        questions: questions.map(q => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          domain: q.domain
+        })),
+        timeLimit: 60, // Default 60 minutes
+        passingScore: Number(passingScore) || 70
+      };
+
+      // Call service layer (will route to mock or real API)
+      const response = await testsService.create(accessToken, testData);
+
+      if (response.success) {
+        toast({
+          title: 'Test Created Successfully',
+          description: `"${testName}" has been created with ${questions.length} questions.`,
+        });
+
+        // Reset form
+        setTestName('');
+        setDomain('Web');
+        setQuestions([]);
+        setFormData({
+          question: '',
+          option1: '',
+          option2: '',
+          option3: '',
+          option4: '',
+          correctAnswer: 'option1',
+        });
+      } else {
+        throw new Error('Failed to create test');
+      }
+    } catch (err: any) {
+      console.error('Error creating test:', err);
+      toast({
+        title: 'Error',
+        description: err.message || 'Failed to create test. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsSubmitting(false);
-      // Reset form
-      setTestName('');
-      setDomain('Web');
-      setQuestions([]);
-      setFormData({
-        question: '',
-        option1: '',
-        option2: '',
-        option3: '',
-        option4: '',
-        correctAnswer: 'option1',
-      });
-    }, 500);
+    }
   };
 
   return (
     <div className="p-8 space-y-6">
+      {/* Data Mode Indicator (Development Helper) */}
+      {process.env.NODE_ENV === 'development' && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {dataMode.emoji} <strong>{dataMode.mode}</strong> - {dataMode.description}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">
           Create Assessment Test

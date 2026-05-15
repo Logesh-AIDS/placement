@@ -102,19 +102,56 @@ export default function UsersPage() {
     return searchMatch && roleMatch;
   });
 
-  const handleDeleteUser = (userId: number) => {
-    setUsers(users.filter((user) => user.id !== userId));
+  const handleDeleteUser = async (userId: number) => {
+    if (!accessToken) return;
+    
+    try {
+      await usersService.delete(accessToken, userId);
+      setUsers(users.filter((user) => user.id !== userId));
+      toast({
+        title: 'Success',
+        description: 'User deactivated successfully',
+      });
+    } catch (err: any) {
+      console.error('Error deleting user:', err);
+      toast({
+        title: 'Error',
+        description: err.message || 'Failed to delete user',
+        variant: 'destructive',
+      });
+    }
   };
 
   const studentUsers = users.filter((u) => u.role === 'student');
   const hrUsers = users.filter((u) => u.role === 'hr');
   const avgScore = Math.round(
     studentUsers.reduce((sum, u) => sum + (typeof u.score === 'number' ? u.score : 0), 0) /
-      studentUsers.length
+      (studentUsers.length || 1)
   );
+
+  if (loading) {
+    return (
+      <div className="p-8 space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Loading users...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-6">
+      {/* Data Mode Indicator (Development Helper) */}
+      {process.env.NODE_ENV === 'development' && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {dataMode.emoji} <strong>{dataMode.mode}</strong> - {dataMode.description}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">
           User Management
@@ -123,6 +160,14 @@ export default function UsersPage() {
           View and manage all users on the platform
         </p>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

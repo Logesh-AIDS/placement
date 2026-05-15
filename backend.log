@@ -194,3 +194,5 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
 [0mGET /api/jobs/my [36m304[0m 814.125 ms - -[0m
 [DB] SELECT key, value FROM portal_settings | 413ms | 1 rows
 [0mGET /api/settings [36m304[0m 819.413 ms - -[0m
+[DB] Pool client error (will reconnect): Connection terminated unexpectedly
+[DB] Pool client error (will reconnect): Connection terminated unexpectedly
