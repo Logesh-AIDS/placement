@@ -196,3 +196,80 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
 [0mGET /api/settings [36m304[0m 819.413 ms - -[0m
 [DB] Pool client error (will reconnect): Connection terminated unexpectedly
 [DB] Pool client error (will reconnect): Connection terminated unexpectedly
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = $1 | 5011ms | 1 rows
+[0mPOST /api/auth/logout [32m200[0m 5016.876 ms - 53[0m
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 339ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 460ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 316ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1382.682 ms - 595[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 301ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 714ms | 1 rows
+[0mGET /api/settings [36m304[0m 1015.976 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 504ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 312ms | 1 rows
+[0mGET /api/settings [36m304[0m 817.576 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 294ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 308ms | 1 rows
+[0mGET /api/settings [36m304[0m 603.073 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 543ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 310ms | 1 rows
+[0mGET /api/settings [36m304[0m 854.630 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 768ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 405ms | 1 rows
+[0mGET /api/settings [36m304[0m 1177.450 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 318ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 313ms | 1 rows
+[0mGET /api/settings [36m304[0m 632.391 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 388ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 411ms | 1 rows
+[0mGET /api/settings [36m304[0m 799.553 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 612ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 326ms | 1 rows
+[0mGET /api/settings [36m304[0m 939.598 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 360ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 362ms | 1 rows
+[0mGET /api/auth/me [32m200[0m 725.763 ms - 234[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 329ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 303ms | 1 rows
+[0mGET /api/settings [36m304[0m 633.122 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 497ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 306ms | 1 rows
+[0mGET /api/settings [36m304[0m 804.502 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 318ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 288ms | 1 rows
+[0mGET /api/settings [36m304[0m 609.069 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 453ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 717ms | 1 rows
+[0mGET /api/settings [36m304[0m 1171.584 ms - -[0m
+[0mGET /api/auth/me [0m-[0m - ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 298ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 344ms | 1 rows
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 470ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 365ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 365ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1456.904 ms - 595[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 294ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 526ms | 1 rows
+[0mGET /api/settings [36m304[0m 820.803 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 609ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 411ms | 1 rows
+[0mGET /api/settings [36m304[0m 1020.600 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 325ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 473ms | 1 rows
+[0mGET /api/settings [36m304[0m 802.956 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 292ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 319ms | 1 rows
+[0mGET /api/settings [36m304[0m 612.122 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 381ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 536ms | 1 rows
+[0mGET /api/settings [36m304[0m 919.968 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 607ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 716ms | 1 rows
+[0mGET /api/settings [36m304[0m 1324.784 ms - -[0m
+[DB] Pool client error (will reconnect): Connection terminated unexpectedly
