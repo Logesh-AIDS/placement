@@ -18,3 +18,179 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
 [0mGET /health [32m200[0m 1.303 ms - 61[0m
 [0mHEAD /uploads/resumes/resume_2_1778665937729.pdf [32m200[0m 0.666 ms - 401929[0m
 [0mHEAD /uploads/resumes/resume_2_1778665937729.pdf [32m200[0m 0.227 ms - 401929[0m
+[DB] Pool client error (will reconnect): Connection terminated unexpectedly
+[0mGET /api/auth/me [33m401[0m 7.838 ms - 73[0m
+[DB] SELECT rt.*, u.id AS uid, u.email, u.role, u.is_active
+       FROM refresh_token | 4378ms | 1 rows
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE id = $1 | 320ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 491ms | 1 rows
+[0mPOST /api/auth/refresh [32m200[0m 5200.807 ms - 407[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 700ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 614ms | 1 rows
+[0mGET /api/auth/me [32m200[0m 1316.382 ms - 229[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 333ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 329ms | 1 rows
+[0mGET /api/settings [36m304[0m 667.161 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 402ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 616ms | 1 rows
+[0mGET /api/settings [36m304[0m 1020.541 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 312ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 315ms | 1 rows
+[0mGET /api/settings [36m304[0m 630.357 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 319ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 378ms | 1 rows
+[0mGET /api/settings [36m304[0m 698.191 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 323ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              phone, colleg | 629ms | 1 rows
+[0mGET /api/profile [36m304[0m 955.057 ms - -[0m
+[0mGET /uploads/photos/photo_2_1778669290229.jpeg [32m200[0m 3.164 ms - 1372984[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 610ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              phone, colleg | 614ms | 1 rows
+[0mGET /api/profile [36m304[0m 1225.902 ms - -[0m
+[0mGET /uploads/resumes/resume_2_1778665937729.pdf [32m200[0m 1.677 ms - 401929[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 339ms | 1 rows
+[DB] SELECT t.*, u.name AS created_by_name
+       FROM tests t
+       JOIN users u ON | 335ms | 0 rows
+[0mGET /api/tests?domain=Web [36m304[0m 677.211 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 328ms | 1 rows
+[DB] SELECT t.*, u.name AS created_by_name
+       FROM tests t
+       JOIN users u ON | 320ms | 0 rows
+[0mGET /api/tests?domain=Web [36m304[0m 649.072 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 4491ms | 1 rows
+[DB] SELECT ta.*, t.title AS test_title, t.domain, t.passing_marks
+       FROM test_a | 612ms | 0 rows
+[0mGET /api/test-attempts/my [36m304[0m 5106.762 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 402ms | 1 rows
+[DB] SELECT ta.*, t.title AS test_title, t.domain, t.passing_marks
+       FROM test_a | 614ms | 0 rows
+[0mGET /api/test-attempts/my [36m304[0m 1018.712 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 419ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 614ms | 1 rows
+[0mGET /api/settings [36m304[0m 1033.817 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 408ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 614ms | 1 rows
+[0mGET /api/settings [36m304[0m 1023.337 ms - -[0m
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = $1 | 512ms | 1 rows
+[0mPOST /api/auth/logout [32m200[0m 512.423 ms - 53[0m
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 608ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 363ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 715ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1952.595 ms - 584[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 316ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 537ms | 1 rows
+[0mGET /api/settings [36m304[0m 855.266 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 611ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 717ms | 1 rows
+[0mGET /api/settings [36m304[0m 1329.556 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 611ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 614ms | 1 rows
+[0mGET /api/settings [36m304[0m 1226.755 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 420ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 499ms | 1 rows
+[0mGET /api/settings [36m304[0m 921.088 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 540ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              phone, colleg | 714ms | 1 rows
+[0mGET /api/profile [32m200[0m 1255.057 ms - 486[0m
+[0mGET /uploads/photos/photo_2_1778669290229.jpeg [32m200[0m 2.851 ms - 1372984[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 608ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              phone, colleg | 614ms | 1 rows
+[0mGET /api/profile [36m304[0m 1223.187 ms - -[0m
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = $1 | 326ms | 1 rows
+[0mPOST /api/auth/logout [32m200[0m 326.846 ms - 53[0m
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 446ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 365ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 717ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1781.587 ms - 595[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 490ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 614ms | 1 rows
+[0mGET /api/settings [36m304[0m 1110.428 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 408ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 511ms | 1 rows
+[0mGET /api/settings [36m304[0m 919.978 ms - -[0m
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = $1 | 365ms | 1 rows
+[0mPOST /api/auth/logout [32m200[0m 368.215 ms - 53[0m
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 344ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 740ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 504ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1855.430 ms - 572[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 318ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 353ms | 1 rows
+[0mGET /api/settings [36m304[0m 672.914 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 407ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 315ms | 1 rows
+[0mGET /api/settings [36m304[0m 723.341 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 520ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 615ms | 1 rows
+[0mGET /api/auth/me [32m200[0m 1136.295 ms - 225[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 362ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 409ms | 1 rows
+[0mGET /api/settings [36m304[0m 772.815 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 508ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 630ms | 1 rows
+[0mGET /api/settings [36m304[0m 1140.143 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 499ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 404ms | 1 rows
+[0mGET /api/auth/me [36m304[0m 944.697 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 464ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 819ms | 1 rows
+[0mGET /api/settings [36m304[0m 1283.615 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 464ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 322ms | 1 rows
+[0mGET /api/settings [36m304[0m 787.828 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 382ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 539ms | 1 rows
+[0mGET /api/auth/me [36m304[0m 925.835 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 572ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 614ms | 1 rows
+[0mGET /api/settings [36m304[0m 1187.234 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 405ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 615ms | 1 rows
+[0mGET /api/settings [36m304[0m 1021.250 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 392ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 409ms | 1 rows
+[0mGET /api/auth/me [36m304[0m 802.065 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 570ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 329ms | 1 rows
+[0mGET /api/settings [36m304[0m 901.105 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 693ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 717ms | 1 rows
+[0mGET /api/settings [36m304[0m 1411.260 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 331ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status,
+              last_login_at | 417ms | 1 rows
+[0mGET /api/auth/me [36m304[0m 772.286 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 574ms | 1 rows
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 574ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 818ms | 1 rows
+[0mGET /api/settings [36m304[0m 1394.200 ms - -[0m
+[DB] SELECT
+         j.*,
+         COUNT(a.id)::int AS application_count
+       FROM  | 818ms | 2 rows
+[0mGET /api/jobs/my [32m200[0m 1394.071 ms - 648[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 404ms | 1 rows
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 404ms | 1 rows
+[DB] SELECT
+         j.*,
+         COUNT(a.id)::int AS application_count
+       FROM  | 409ms | 2 rows
+[0mGET /api/jobs/my [36m304[0m 814.125 ms - -[0m
+[DB] SELECT key, value FROM portal_settings | 413ms | 1 rows
+[0mGET /api/settings [36m304[0m 819.413 ms - -[0m

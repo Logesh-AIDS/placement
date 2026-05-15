@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -13,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Trash2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Search, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -22,22 +23,76 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DomainBadge } from '@/components/placement/shared/DomainBadge';
+import { useAuth } from '@/components/providers/AuthContext';
+import { usersService, getDataModeInfo } from '@/lib/services';
+import { useToast } from '@/hooks/use-toast';
 
-const mockUsers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'student', domain: 'Web', score: 850, joinedDate: '2024-04-10' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'student', domain: 'ML', score: 920, joinedDate: '2024-04-09' },
-  { id: 3, name: 'Tech Corp HR', email: 'hr@techcorp.com', role: 'hr', domain: '-', score: '-', joinedDate: '2024-04-08' },
-  { id: 4, name: 'Alice Johnson', email: 'alice@example.com', role: 'student', domain: 'DSA', score: 780, joinedDate: '2024-04-07' },
-  { id: 5, name: 'StartUp Inc HR', email: 'hr@startup.com', role: 'hr', domain: '-', score: '-', joinedDate: '2024-04-06' },
-  { id: 6, name: 'Bob Wilson', email: 'bob@example.com', role: 'student', domain: 'Cloud', score: 720, joinedDate: '2024-04-05' },
-  { id: 7, name: 'Emma Davis', email: 'emma@example.com', role: 'student', domain: 'Web', score: 890, joinedDate: '2024-04-04' },
-  { id: 8, name: 'Global Tech HR', email: 'hr@globaltech.com', role: 'hr', domain: '-', score: '-', joinedDate: '2024-04-03' },
-];
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'student' | 'hr' | 'admin';
+  domain?: string;
+  score?: number | string;
+  joinedDate: string;
+  isActive?: boolean;
+}
 
 export default function UsersPage() {
-  const [users, setUsers] = useState(mockUsers);
+  const { accessToken } = useAuth();
+  const { toast } = useToast();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  
+  // Get data mode info for display
+  const dataMode = getDataModeInfo();
+
+  // Load users on component mount
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!accessToken) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await usersService.getAll(accessToken);
+        
+        if (response.success) {
+          // Transform API response to match component expectations
+          const transformedUsers = response.data.map((user: any) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            domain: user.domain || '-',
+            score: user.score !== undefined ? user.score : '-',
+            joinedDate: user.created_at || user.joinedDate,
+            isActive: user.isActive !== false
+          }));
+          
+          setUsers(transformedUsers);
+        } else {
+          throw new Error('Failed to load users');
+        }
+      } catch (err: any) {
+        console.error('Error loading users:', err);
+        setError(err.message || 'Failed to load users');
+        toast({
+          title: 'Error',
+          description: err.message || 'Failed to load users. Please try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, [accessToken, toast]);
 
   const filteredUsers = users.filter((user) => {
     const searchMatch =
