@@ -9,11 +9,11 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 
     const conditions: string[] = [];
     const params: unknown[] = [];
-    let idx = 1;
+    let paramIndex = 1;
 
-    if (role)   { conditions.push(`role = $${idx++}`);   params.push(role); }
-    if (domain) { conditions.push(`domain = $${idx++}`); params.push(domain); }
-    if (status) { conditions.push(`status = $${idx++}`); params.push(status); }
+    if (role)   { conditions.push(`role = $${paramIndex++}`);   params.push(role); }
+    if (domain) { conditions.push(`domain = $${paramIndex++}`); params.push(domain); }
+    if (status) { conditions.push(`status = $${paramIndex++}`); params.push(status); }
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const offset = (Number(page) - 1) * Number(limit);
@@ -23,7 +23,7 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
         `SELECT id, name, email, role, domain, score, status, created_at
          FROM users ${where}
          ORDER BY created_at DESC
-         LIMIT $${idx} OFFSET $${idx + 1}`,
+         LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
         [...params, Number(limit), offset]
       ),
       query(`SELECT COUNT(*) FROM users ${where}`, params),

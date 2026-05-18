@@ -36,7 +36,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       return next(createError('Domain is required for students.', 400));
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await query(
       `INSERT INTO users (name, email, password, role, domain, password_changed_at)
@@ -279,7 +279,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
       return next(createError('New password must differ from current password.', 400));
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update password and set password_changed_at — this invalidates all existing access tokens
     await query(
@@ -373,7 +373,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     }
 
     const { id: tokenId, user_id } = result.rows[0];
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update password and mark token as used in a single transaction
     await query('BEGIN');

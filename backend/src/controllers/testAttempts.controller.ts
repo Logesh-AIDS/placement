@@ -18,13 +18,22 @@ export const startAttempt = async (req: Request, res: Response, next: NextFuncti
       return next(createError(`This test is for domain: ${test.rows[0].domain}.`, 400));
     }
 
-    // Check no existing attempt
-    const existing = await query(
-      'SELECT id FROM test_attempts WHERE student_id = $1 AND test_id = $2',
+    // Check for incomplete attempts - if there's an incomplete attempt, return it
+    const incomplete = await query(
+      'SELECT id FROM test_attempts WHERE student_id = $1 AND test_id = $2 AND completed_at IS NULL',
       [student_id, test_id]
     );
-    if (existing.rows[0]) return next(createError('You have already attempted this test.', 409));
+    
+    if (incomplete.rows[0]) {
+      // Return the existing incomplete attempt
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Resuming existing attempt.', 
+        data: incomplete.rows[0] 
+      });
+    }
 
+    // Allow multiple attempts - create a new one
     const result = await query(
       `INSERT INTO test_attempts (student_id, test_id, score, total_marks)
        VALUES ($1, $2, 0, $3)
@@ -51,10 +60,10 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
     );
     if (!attempt.rows[0]) return next(createError('Attempt not found or already submitted.', 404));
 
-    // Fetch correct answers and test details
+    // Fetch all questions with their details
     const [questions, testDetails] = await Promise.all([
       query(
-        'SELECT id, correct_answer, marks FROM questions WHERE test_id = $1',
+        'SELECT id, question_text, correct_answer, marks FROM questions WHERE test_id = $1',
         [attempt.rows[0].test_id]
       ),
       query(
@@ -63,36 +72,75 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
       ),
     ]);
 
-    // Calculate score
-    let score = 0;
+    // Separate MCQ and coding questions
+    const mcqQuestions: any[] = [];
+    const codingQuestions: any[] = [];
+
     for (const q of questions.rows) {
-      if (answers[q.id] === q.correct_answer) {
-        score += q.marks;
+      let questionData: any = null;
+      try {
+        questionData = JSON.parse(q.question_text);
+      } catch {
+        questionData = null;
+      }
+
+      if (questionData?.type === 'coding') {
+        codingQuestions.push({ ...q, questionData });
+      } else {
+        mcqQuestions.push(q);
       }
     }
 
+    // Calculate MCQ score only
+    let mcqScore = 0;
+    for (const q of mcqQuestions) {
+      if (answers[q.id] === q.correct_answer) {
+        mcqScore += q.marks;
+      }
+    }
+
+    // Save coding answers to coding_answers table for manual review
+    for (const q of codingQuestions) {
+      const studentAnswer = answers[q.id] || '';
+      
+      await query(
+        `INSERT INTO coding_answers (attempt_id, question_id, student_id, code_answer, max_marks)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (attempt_id, question_id) DO UPDATE
+         SET code_answer = EXCLUDED.code_answer`,
+        [req.params.id, q.id, student_id, studentAnswer, q.marks]
+      );
+    }
+
     const totalMarks = attempt.rows[0].total_marks;
-    const percentage = Math.round((score / totalMarks) * 100);
+    const percentage = Math.round((mcqScore / totalMarks) * 100);
     const passingMarks = testDetails.rows[0]?.passing_marks || 0;
 
-    // Update test attempt with score and completion time
+    // Update test attempt with MCQ score only (coding marks will be added after review)
     const result = await query(
       `UPDATE test_attempts
        SET score = $1, completed_at = CURRENT_TIMESTAMP
        WHERE id = $2
        RETURNING *`,
-      [score, req.params.id]
+      [mcqScore, req.params.id]
     );
 
-    // CRITICAL FIX: Explicitly update user's score and status
-    // This ensures the score is updated even if the database trigger fails
-    const status = percentage >= 80 ? 'qualified' : percentage >= 50 ? 'partial' : 'not_qualified';
+    // Update user's score to their BEST score across all attempts
+    const bestAttempt = await query(
+      `SELECT MAX(score) as best_score FROM test_attempts 
+       WHERE student_id = $1 AND completed_at IS NOT NULL`,
+      [student_id]
+    );
+    
+    const bestScore = bestAttempt.rows[0]?.best_score || mcqScore;
+    const bestPercentage = Math.round((bestScore / totalMarks) * 100);
+    const status = bestPercentage >= 80 ? 'qualified' : bestPercentage >= 50 ? 'partial' : 'not_qualified';
     
     await query(
       `UPDATE users
        SET score = $1, status = $2
        WHERE id = $3`,
-      [score, status, student_id]
+      [bestScore, status, student_id]
     );
 
     // Add calculated fields to response
@@ -100,11 +148,15 @@ export const submitAttempt = async (req: Request, res: Response, next: NextFunct
       ...result.rows[0],
       percentage,
       passing_marks: passingMarks,
+      has_coding_questions: codingQuestions.length > 0,
+      coding_questions_count: codingQuestions.length,
     };
 
     res.status(200).json({
       success: true,
-      message: 'Test submitted.',
+      message: codingQuestions.length > 0 
+        ? 'Test submitted. Coding questions will be reviewed by admin.' 
+        : 'Test submitted.',
       data: attemptResult,
     });
   } catch (err) {

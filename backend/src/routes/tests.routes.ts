@@ -6,6 +6,8 @@ import {
   createTest,
   updateTest,
   deleteTest,
+  importTestFromXML,
+  exportTestToXML,
 } from '../controllers/tests.controller';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validate.middleware';
@@ -34,5 +36,16 @@ router.post(
 
 router.patch('/:id', authenticate, authorize('admin'), updateTest);
 router.delete('/:id', authenticate, authorize('admin'), deleteTest);
+
+// XML import/export
+router.post(
+  '/import-xml',
+  authenticate,
+  authorize('admin'),
+  [body('xmlContent').trim().notEmpty().withMessage('XML content is required.')],
+  validate,
+  importTestFromXML
+);
+router.get('/:id/export-xml', authenticate, authorize('admin'), exportTestToXML);
 
 export default router;

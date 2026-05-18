@@ -272,6 +272,12 @@ export default function AdminDashboard() {
                 Create Assessment Test
               </Button>
             </Link>
+            <Link href="/dashboard/admin/review-submissions" className="block">
+              <Button className="w-full justify-start" variant="outline">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Review Coding Submissions
+              </Button>
+            </Link>
             <Link href="/dashboard/admin/users" className="block">
               <Button className="w-full justify-start" variant="outline">
                 <Users className="mr-2 h-4 w-4" />

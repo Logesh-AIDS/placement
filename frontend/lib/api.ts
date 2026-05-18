@@ -48,6 +48,21 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T
   }
 
   if (!res.ok) {
+    // If 401 Unauthorized, clear session and redirect to login
+    if (res.status === 401) {
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('pp_access_token');
+        localStorage.removeItem('pp_refresh_token');
+        localStorage.removeItem('pp_user');
+        
+        // Redirect to login page if not already there
+        if (!window.location.pathname.includes('/auth/login')) {
+          window.location.href = '/auth/login?expired=true';
+        }
+      }
+    }
+    
     throw new ApiError(res.status, data.message || `Request failed (${res.status}).`);
   }
 
@@ -139,6 +154,16 @@ export const applicationsApi = {
 
   getMy: (token: string) =>
     request<{ success: boolean; data: Application[] }>('/applications/my', { token }),
+
+  getHRApplications: (token: string) =>
+    request<{ success: boolean; data: HRApplication[] }>('/applications/hr/all', { token }),
+
+  updateStatus: (token: string, applicationId: number, status: 'applied' | 'shortlisted' | 'rejected') =>
+    request<{ success: boolean; data: Application }>(`/applications/${applicationId}/status`, {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify({ status }),
+    }),
 };
 
 // ── Tests endpoints ───────────────────────────────────────────────────────────
@@ -168,6 +193,47 @@ export const testsApi = {
 
   getMyAttempts: (token: string) =>
     request<{ success: boolean; data: AttemptResult[] }>('/test-attempts/my', { token }),
+
+  // XML import/export
+  importFromXML: (token: string, xmlContent: string) =>
+    request<{ success: boolean; message: string; data: TestMeta }>('/tests/import-xml', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ xmlContent }),
+    }),
+
+  exportToXML: async (token: string, testId: number): Promise<string> => {
+    const res = await fetch(`${BASE_URL}/tests/${testId}/export-xml`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new ApiError(res.status, data.message || 'Export failed');
+    }
+    return await res.text();
+  },
+};
+
+// ── Users endpoints (Admin only) ──────────────────────────────────────────────
+export const usersApi = {
+  getAll: (token: string, filters?: { role?: string; domain?: string; status?: string; page?: number; limit?: number }) =>
+    request<UsersResponse>(`/users?${new URLSearchParams(filters as any).toString()}`, { token }),
+
+  getById: (token: string, id: number) =>
+    request<{ success: boolean; data: User }>(`/users/${id}`, { token }),
+
+  update: (token: string, id: number, payload: Partial<UpdateUserPayload>) =>
+    request<{ success: boolean; data: User }>(`/users/${id}`, {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify(payload),
+    }),
+
+  delete: (token: string, id: number) =>
+    request<{ success: boolean; message: string }>(`/users/${id}`, {
+      method: 'DELETE',
+      token,
+    }),
 };
 
 // ── Profile endpoints ─────────────────────────────────────────────────────────
@@ -213,6 +279,34 @@ export const profileApi = {
 
   deleteResume: (token: string) =>
     request('/profile/resume', { method: 'DELETE', token }),
+};
+
+// ── Admin Coding Review endpoints ────────────────────────────────────────────
+export const adminReviewApi = {
+  getTestAttemptsWithCoding: (token: string) =>
+    request<{ success: boolean; data: TestAttemptWithCoding[] }>('/admin/test-attempts', { token }),
+
+  getPendingSubmissions: (token: string, status?: 'pending' | 'reviewed' | 'all') =>
+    request<{ success: boolean; data: CodingSubmission[] }>(
+      `/admin/coding-submissions${status ? `?status=${status}` : ''}`,
+      { token }
+    ),
+
+  getSubmissionsByAttempt: (token: string, attemptId: number) =>
+    request<{ success: boolean; data: CodingSubmission[] }>(
+      `/admin/coding-submissions/${attemptId}`,
+      { token }
+    ),
+
+  gradeSubmission: (token: string, submissionId: number, marks_obtained: number, admin_feedback?: string) =>
+    request<{ success: boolean; message: string; data: any }>(
+      `/admin/coding-submissions/${submissionId}/grade`,
+      {
+        method: 'POST',
+        token,
+        body: JSON.stringify({ marks_obtained, admin_feedback }),
+      }
+    ),
 };
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -338,6 +432,30 @@ export interface Application {
   location?: string;
 }
 
+export interface HRApplication {
+  id: number;
+  student_id: number;
+  job_id: number;
+  status: 'applied' | 'shortlisted' | 'rejected';
+  cover_letter: string | null;
+  applied_at: string;
+  updated_at: string;
+  student_name: string;
+  student_email: string;
+  student_domain: DomainType;
+  student_score: number;
+  student_status: string;
+  phone: string | null;
+  college: string | null;
+  graduation_year: string | null;
+  profile_photo_url: string | null;
+  resume_url: string | null;
+  resume_name: string | null;
+  job_title: string;
+  job_role: string;
+  job_domain: DomainType;
+}
+
 // ── Test types ────────────────────────────────────────────────────────────────
 export interface TestMeta {
   id: number;
@@ -376,4 +494,71 @@ export interface AttemptResult {
   test_title?: string;
   domain?: string;
   passing_marks?: number;
+}
+
+// ── User types (Admin) ────────────────────────────────────────────────────────
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  domain: DomainType | null;
+  score: number;
+  status: string;
+  created_at: string;
+}
+
+export interface UpdateUserPayload {
+  name?: string;
+  role?: UserRole;
+  domain?: DomainType | null;
+  status?: string;
+}
+
+interface UsersResponse {
+  success: boolean;
+  data: User[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+}
+
+// ── Admin Coding Review types ─────────────────────────────────────────────────
+export interface TestAttemptWithCoding {
+  attempt_id: number;
+  student_id: number;
+  test_id: number;
+  score: number;
+  total_marks: number;
+  percentage: number;
+  completed_at: string;
+  student_name: string;
+  student_email: string;
+  test_title: string;
+  coding_questions_count: number;
+  reviewed_count: number;
+}
+
+export interface CodingSubmission {
+  id: number;
+  attempt_id: number;
+  question_id: number;
+  student_id: number;
+  code_answer: string;
+  marks_obtained: number | null;
+  max_marks: number;
+  admin_feedback: string | null;
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  created_at: string;
+  student_name: string;
+  student_email: string;
+  test_title: string;
+  test_id: number;
+  current_score: number;
+  test_total_marks: number;
+  completed_at: string;
+  question_text?: string;
 }

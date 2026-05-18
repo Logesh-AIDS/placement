@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthContext';
 import { ApiError } from '@/lib/api';
 
@@ -17,6 +19,10 @@ export function LoginForm() {
 
   const { login, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Check if redirected due to expired session
+  const sessionExpired = searchParams.get('expired') === 'true';
 
   // Redirect after user is set in context (must be in useEffect, not during render)
   useEffect(() => {
@@ -67,6 +73,16 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Session expired alert */}
+        {sessionExpired && (
+          <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800 dark:text-yellow-300">
+              Your session has expired. Please login again.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -116,7 +132,14 @@ export function LoginForm() {
             className="w-full"
             disabled={isLoading || !email || !password}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              'Sign In'
+            )}
           </Button>
 
           <div className="text-center text-sm">

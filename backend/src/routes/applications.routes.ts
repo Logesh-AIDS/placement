@@ -6,6 +6,7 @@ import {
   getApplicationsForJob,
   updateApplicationStatus,
   getAllApplications,
+  getHRApplications,
 } from '../controllers/applications.controller';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validate.middleware';
@@ -25,7 +26,10 @@ router.post(
 // Student views their own applications
 router.get('/my', authenticate, authorize('student'), getMyApplications);
 
-// HR views applications for their job
+// HR views all applications for their jobs
+router.get('/hr/all', authenticate, authorize('hr'), getHRApplications);
+
+// HR views applications for a specific job
 router.get('/job/:jobId', authenticate, authorize('hr'), getApplicationsForJob);
 
 // HR updates application status

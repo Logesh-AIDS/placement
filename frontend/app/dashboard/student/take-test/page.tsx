@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/components/providers/AuthContext';
@@ -286,26 +287,127 @@ export default function TakeTestPage() {
             <CardTitle className="text-lg leading-snug">{q.question_text}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <RadioGroup
-              value={answers[currentQ] ?? ''}
-              onValueChange={(val) => setAnswers((p) => ({ ...p, [currentQ]: val }))}
-            >
-              <div className="space-y-2">
-                {q.options.map((opt, i) => (
-                  <div key={i}
-                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      answers[currentQ] === opt
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:bg-muted/50'
-                    }`}
-                    onClick={() => setAnswers((p) => ({ ...p, [currentQ]: opt }))}
-                  >
-                    <RadioGroupItem value={opt} id={`opt-${i}`} />
-                    <Label htmlFor={`opt-${i}`} className="cursor-pointer flex-1">{opt}</Label>
+            {/* Question Content - Handle both MCQ and Coding */}
+            {(() => {
+              // Parse question to check if it's a coding question
+              let questionData: any = null;
+              try {
+                questionData = JSON.parse(q.question_text);
+              } catch {
+                questionData = null;
+              }
+
+              const isCodingQuestion = questionData?.type === 'coding';
+
+              if (isCodingQuestion) {
+                // CODING QUESTION - Split Screen Layout
+                return (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ minHeight: '500px' }}>
+                    {/* LEFT SIDE - Problem Description */}
+                    <div className="space-y-4 overflow-y-auto pr-4 lg:border-r max-h-[600px]">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{questionData.title}</h3>
+                        <Badge variant="outline" className="mb-4">
+                          {questionData.difficulty || 'medium'}
+                        </Badge>
+                        <div className="prose prose-sm max-w-none">
+                          <p className="whitespace-pre-wrap text-sm text-muted-foreground">{questionData.description}</p>
+                        </div>
+                      </div>
+
+                      {/* Test Cases */}
+                      {questionData.test_cases && questionData.test_cases.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm">Example Test Cases:</h4>
+                          {questionData.test_cases
+                            .filter((tc: any) => !tc.is_hidden)
+                            .map((tc: any, idx: number) => (
+                              <Card key={idx} className="p-3 bg-muted/30">
+                                <div className="space-y-1 text-xs font-mono">
+                                  <div>
+                                    <span className="font-semibold">Input:</span> <code>{tc.input}</code>
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold">Output:</span> <code>{tc.expected_output}</code>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                        </div>
+                      )}
+
+                      {/* Constraints */}
+                      {questionData.constraints && questionData.constraints.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm">Constraints:</h4>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
+                            {questionData.constraints.map((c: string, idx: number) => (
+                              <li key={idx}>{c}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* RIGHT SIDE - Code Editor */}
+                    <div className="flex flex-col">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label className="text-sm font-semibold">Your Solution</Label>
+                        <Badge variant="secondary" className="text-xs">
+                          {questionData.language || 'javascript'}
+                        </Badge>
+                      </div>
+                      <Textarea
+                        value={answers[currentQ] || questionData.starter_code || ''}
+                        onChange={(e) => setAnswers((p) => ({ ...p, [currentQ]: e.target.value }))}
+                        placeholder="Write your code here..."
+                        className="flex-1 font-mono text-sm resize-none min-h-[450px]"
+                        style={{
+                          fontFamily: 'Monaco, Menlo, "Ubuntu Mono", Consolas, "Courier New", monospace',
+                          fontSize: '13px',
+                          lineHeight: '1.6',
+                          tabSize: 2,
+                        }}
+                      />
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-950/20 rounded text-xs text-blue-700 dark:text-blue-300">
+                        💡 This question will be manually evaluated by the admin
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </RadioGroup>
+                );
+              }
+
+              // REGULAR MCQ QUESTION
+              return (
+                <RadioGroup
+                  value={answers[currentQ] ?? ''}
+                  onValueChange={(val) => setAnswers((p) => ({ ...p, [currentQ]: val }))}
+                >
+                  <div className="space-y-2">
+                    {q.options.map((opt, i) => {
+                      // Handle both string options and object options {id, text}
+                      // IMPORTANT: Store the ID (a, b, c, d) not the text, to match correct_answer in DB
+                      const optionValue = typeof opt === 'string' ? opt : opt.id;
+                      const optionText = typeof opt === 'string' ? opt : opt.text;
+                      
+                      return (
+                        <div key={i}
+                          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                            answers[currentQ] === optionValue
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:bg-muted/50'
+                          }`}
+                          onClick={() => setAnswers((p) => ({ ...p, [currentQ]: optionValue }))}
+                        >
+                          <RadioGroupItem value={optionValue} id={`opt-${i}`} />
+                          <Label htmlFor={`opt-${i}`} className="cursor-pointer flex-1">{optionText}</Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </RadioGroup>
+              );
+            })()}
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setCurrentQ((q) => q - 1)}
@@ -354,6 +456,8 @@ export default function TakeTestPage() {
   if (phase === 'result' && result && selectedTest) {
     const passed    = result.score >= selectedTest.passing_marks;
     const pct       = result.percentage ?? Math.round((result.score / result.total_marks) * 100);
+    const hasCoding = (result as any).has_coding_questions;
+    const codingCount = (result as any).coding_questions_count || 0;
 
     return (
       <div className="p-8 max-w-xl mx-auto">
@@ -365,15 +469,30 @@ export default function TakeTestPage() {
               <CheckCircle2 className={`w-9 h-9 ${passed ? 'text-green-600' : 'text-yellow-500'}`} />
             </div>
             <CardTitle className="text-2xl">
-              {passed ? '🎉 Test Passed!' : 'Test Completed'}
+              {hasCoding ? 'Test Submitted!' : passed ? '🎉 Test Passed!' : 'Test Completed'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
+            {/* Coding questions pending notice */}
+            {hasCoding && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/20 p-4 text-sm">
+                <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">
+                  ⏳ Coding Questions Under Review
+                </p>
+                <p className="text-blue-700 dark:text-blue-400">
+                  {codingCount} coding {codingCount === 1 ? 'question' : 'questions'} will be manually reviewed by the admin. 
+                  Your final score will be updated after the review is complete.
+                </p>
+              </div>
+            )}
+
             {/* Score display */}
             <div className={`rounded-xl p-6 text-center ${
               passed ? 'bg-green-50 dark:bg-green-950/20' : 'bg-yellow-50 dark:bg-yellow-950/20'
             }`}>
-              <p className="text-xs text-muted-foreground mb-1">Your Score</p>
+              <p className="text-xs text-muted-foreground mb-1">
+                {hasCoding ? 'Current Score (MCQ Only)' : 'Your Score'}
+              </p>
               <p className={`text-5xl font-bold ${passed ? 'text-green-600' : 'text-yellow-600'}`}>
                 {result.score}
               </p>
@@ -391,20 +510,20 @@ export default function TakeTestPage() {
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">Status</p>
                 <p className={`font-bold ${passed ? 'text-green-600' : 'text-yellow-600'}`}>
-                  {passed ? 'Passed ✓' : 'Not Passed'}
+                  {hasCoding ? 'Pending Review' : passed ? 'Passed ✓' : 'Not Passed'}
                 </p>
               </div>
             </div>
 
-            {passed ? (
+            {!hasCoding && passed ? (
               <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950/20 p-3 text-sm text-green-700 dark:text-green-400">
                 ✓ Jobs and Applications are now unlocked. Your score has been saved to your profile.
               </div>
-            ) : (
+            ) : !hasCoding ? (
               <div className="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 p-3 text-sm text-yellow-700 dark:text-yellow-400">
                 You need {selectedTest.passing_marks - result.score} more marks to pass. You can retake the test.
               </div>
-            )}
+            ) : null}
 
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={() => {

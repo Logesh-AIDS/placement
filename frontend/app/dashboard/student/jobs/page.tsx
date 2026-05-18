@@ -46,7 +46,22 @@ export default function JobsPage() {
   const [error, setError]             = useState('');
   const [search, setSearch]           = useState('');
   const [domain, setDomain]           = useState('all');
-  const [appliedIds, setAppliedIds]   = useState<Set<number>>(new Set());
+  const [appliedJobIds, setAppliedJobIds] = useState<Set<number>>(new Set());
+
+  // Load applied jobs on mount
+  useEffect(() => {
+    const loadAppliedJobs = async () => {
+      if (!accessToken) return;
+      try {
+        const res = await applicationsApi.getMy(accessToken);
+        const appliedIds = new Set(res.data.map((app: any) => app.job_id));
+        setAppliedJobIds(appliedIds);
+      } catch (err) {
+        console.error('Failed to load applied jobs:', err);
+      }
+    };
+    loadAppliedJobs();
+  }, [accessToken]);
 
   const fetchJobs = useCallback(async () => {
     if (!accessToken) return;
@@ -74,7 +89,7 @@ export default function JobsPage() {
     if (!accessToken) return;
     try {
       await applicationsApi.apply(accessToken, jobId);
-      setAppliedIds((prev) => new Set([...prev, jobId]));
+      setAppliedJobIds((prev) => new Set([...prev, jobId]));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to apply.');
     }
@@ -159,9 +174,12 @@ export default function JobsPage() {
         filtered.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((job) => {
-              const applied    = appliedIds.has(job.id);
+              const applied    = appliedJobIds.has(job.id);
               const eligible   = canApply(job);
               const isNew      = Date.now() - new Date(job.created_at).getTime() < 48 * 3600000;
+
+              // Hide already applied jobs
+              if (applied) return null;
 
               return (
                 <Card key={job.id}

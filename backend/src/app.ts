@@ -14,6 +14,7 @@ import testRoutes from './routes/tests.routes';
 import testAttemptRoutes from './routes/testAttempts.routes';
 import profileRoutes from './routes/profile.routes';
 import settingsRoutes from './routes/settings.routes';
+import codingReviewRoutes from './routes/codingReview.routes';
 import { errorHandler, notFound } from './middleware/error.middleware';
 
 dotenv.config();
@@ -132,6 +133,7 @@ app.use('/api/tests', testRoutes);
 app.use('/api/test-attempts', testAttemptRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', codingReviewRoutes);
 
 // ── Error handling ────────────────────────────────────────────────────────────
 app.use(notFound);

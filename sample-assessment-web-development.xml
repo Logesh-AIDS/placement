@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessment version="1.0">
+  <metadata>
+    <title>Web Development Fundamentals</title>
+    <domain>Web</domain>
+    <description>Comprehensive assessment covering HTML, CSS, JavaScript, and React basics</description>
+    <duration_minutes>60</duration_minutes>
+    <passing_marks>70</passing_marks>
+    <total_marks>100</total_marks>
+    <created_by>Admin</created_by>
+  </metadata>
+  
+  <questions>
+    <!-- Question 1: React Basics -->
+    <question type="mcq" id="q1">
+      <title>What is React?</title>
+      <description>Choose the correct answer about React</description>
+      <marks>10</marks>
+      <difficulty>easy</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">A JavaScript library for building user interfaces</option>
+        <option id="b">A CSS framework for styling</option>
+        <option id="c">A database management system</option>
+        <option id="d">A backend framework for Node.js</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>React is a JavaScript library developed by Facebook for building user interfaces, particularly single-page applications.</explanation>
+    </question>
+
+    <!-- Question 2: HTTP Status Codes -->
+    <question type="core_subject_mcq" id="q2">
+      <title>HTTP Status Codes</title>
+      <description>Which HTTP status code indicates a successful request?</description>
+      <marks>5</marks>
+      <difficulty>easy</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">404 Not Found</option>
+        <option id="b">500 Internal Server Error</option>
+        <option id="c">200 OK</option>
+        <option id="d">301 Moved Permanently</option>
+      </options>
+      <correct_answer>c</correct_answer>
+      <explanation>HTTP 200 OK indicates that the request has succeeded. The information returned with the response is dependent on the method used in the request.</explanation>
+    </question>
+
+    <!-- Question 3: CSS Flexbox -->
+    <question type="mcq" id="q3">
+      <title>CSS Flexbox Property</title>
+      <description>Which CSS property is used to make a flex container?</description>
+      <marks>10</marks>
+      <difficulty>easy</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">display: flex;</option>
+        <option id="b">flex-container: true;</option>
+        <option id="c">layout: flexbox;</option>
+        <option id="d">container: flex;</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>The display: flex; property is used to create a flex container, enabling flexbox layout for its children.</explanation>
+    </question>
+
+    <!-- Question 4: JavaScript Closures -->
+    <question type="mcq" id="q4">
+      <title>JavaScript Closures</title>
+      <description>What is a closure in JavaScript?</description>
+      <marks>15</marks>
+      <difficulty>medium</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">A function that has access to variables in its outer scope</option>
+        <option id="b">A way to close browser windows</option>
+        <option id="c">A method to end a loop</option>
+        <option id="d">A syntax for closing HTML tags</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>A closure is a function that has access to variables in its outer (enclosing) lexical scope, even after the outer function has returned.</explanation>
+    </question>
+
+    <!-- Question 5: React Hooks -->
+    <question type="mcq" id="q5">
+      <title>React useState Hook</title>
+      <description>What does the useState hook return?</description>
+      <marks>10</marks>
+      <difficulty>medium</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">An array with the current state and a function to update it</option>
+        <option id="b">Only the current state value</option>
+        <option id="c">Only the update function</option>
+        <option id="d">An object with state and setState properties</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>useState returns an array with two elements: the current state value and a function to update that state.</explanation>
+    </question>
+
+    <!-- Question 6: HTML Semantic Elements -->
+    <question type="core_subject_mcq" id="q6">
+      <title>HTML5 Semantic Elements</title>
+      <description>Which of the following is NOT a semantic HTML5 element?</description>
+      <marks>10</marks>
+      <difficulty>easy</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">&lt;header&gt;</option>
+        <option id="b">&lt;nav&gt;</option>
+        <option id="c">&lt;div&gt;</option>
+        <option id="d">&lt;article&gt;</option>
+      </options>
+      <correct_answer>c</correct_answer>
+      <explanation>The &lt;div&gt; element is a generic container and not a semantic element. Semantic elements like &lt;header&gt;, &lt;nav&gt;, and &lt;article&gt; clearly describe their meaning to both the browser and the developer.</explanation>
+    </question>
+
+    <!-- Question 7: JavaScript Promises -->
+    <question type="mcq" id="q7">
+      <title>JavaScript Promises</title>
+      <description>What are the three states of a JavaScript Promise?</description>
+      <marks>15</marks>
+      <difficulty>medium</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">Pending, Fulfilled, Rejected</option>
+        <option id="b">Start, Running, Complete</option>
+        <option id="c">New, Active, Done</option>
+        <option id="d">Init, Process, Finish</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>A Promise has three states: Pending (initial state), Fulfilled (operation completed successfully), and Rejected (operation failed).</explanation>
+    </question>
+
+    <!-- Question 8: CSS Grid -->
+    <question type="mcq" id="q8">
+      <title>CSS Grid Layout</title>
+      <description>Which property defines the number of columns in a CSS Grid?</description>
+      <marks>10</marks>
+      <difficulty>medium</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">grid-template-columns</option>
+        <option id="b">grid-columns</option>
+        <option id="c">columns-count</option>
+        <option id="d">grid-column-number</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>The grid-template-columns property defines the number and size of columns in a CSS Grid layout.</explanation>
+    </question>
+
+    <!-- Question 9: React Component Lifecycle -->
+    <question type="mcq" id="q9">
+      <title>React useEffect Hook</title>
+      <description>When does useEffect run by default?</description>
+      <marks>10</marks>
+      <difficulty>hard</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">After every render</option>
+        <option id="b">Only on component mount</option>
+        <option id="c">Only on component unmount</option>
+        <option id="d">Before every render</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>By default, useEffect runs after every render (both mount and update). You can control this behavior using the dependency array.</explanation>
+    </question>
+
+    <!-- Question 10: JavaScript ES6 -->
+    <question type="mcq" id="q10">
+      <title>ES6 Arrow Functions</title>
+      <description>What is the main difference between arrow functions and regular functions?</description>
+      <marks>5</marks>
+      <difficulty>hard</difficulty>
+      <domain>Web</domain>
+      <options>
+        <option id="a">Arrow functions do not have their own 'this' binding</option>
+        <option id="b">Arrow functions are faster</option>
+        <option id="c">Arrow functions cannot take parameters</option>
+        <option id="d">Arrow functions cannot return values</option>
+      </options>
+      <correct_answer>a</correct_answer>
+      <explanation>Arrow functions do not have their own 'this' context. They inherit 'this' from the enclosing lexical scope, which is often the desired behavior in callbacks and event handlers.</explanation>
+    </question>
+  </questions>
+</assessment>

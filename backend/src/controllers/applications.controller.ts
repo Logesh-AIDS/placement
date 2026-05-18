@@ -109,6 +109,48 @@ export const updateApplicationStatus = async (req: Request, res: Response, next:
   }
 };
 
+// ── GET /api/applications/hr/all  (hr — all applications for HR's jobs) ──────
+export const getHRApplications = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const hr_id = req.user!.id;
+
+    const result = await query(
+      `SELECT 
+        a.id,
+        a.student_id,
+        a.job_id,
+        a.status,
+        a.cover_letter,
+        a.applied_at,
+        a.updated_at,
+        u.name AS student_name,
+        u.email AS student_email,
+        u.domain AS student_domain,
+        u.score AS student_score,
+        u.status AS student_status,
+        u.phone,
+        u.college,
+        u.graduation_year,
+        u.profile_photo_url,
+        u.resume_url,
+        u.resume_name,
+        j.title AS job_title,
+        j.role AS job_role,
+        j.domain AS job_domain
+       FROM applications a
+       JOIN users u ON a.student_id = u.id
+       JOIN jobs j ON a.job_id = j.id
+       WHERE j.hr_id = $1
+       ORDER BY a.applied_at DESC`,
+      [hr_id]
+    );
+
+    res.status(200).json({ success: true, data: result.rows });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ── GET /api/applications  (admin — all applications) ────────────────────────
 export const getAllApplications = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

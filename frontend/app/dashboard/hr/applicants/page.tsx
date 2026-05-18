@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -12,83 +12,84 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ApplicantCard, type Applicant } from '@/components/placement/hr/ApplicantCard';
-import { Users, Search } from 'lucide-react';
-
-// Mock data — replace with real API call
-const MOCK_APPLICANTS: Applicant[] = [
-  {
-    id: 1,
-    name: 'Arun Kumar',
-    email: 'arun@college.edu',
-    domain: 'Web',
-    score: 88,
-    status: 'applied',
-    appliedAt: '2024-04-10',
-    college: 'IIT Madras',
-    phone: '+91 98765 43210',
-    photoUrl: null,
-    resumeUrl: '/mock/resume.pdf',
-    resumeName: 'Arun_Kumar_Resume.pdf',
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    email: 'priya@college.edu',
-    domain: 'ML',
-    score: 74,
-    status: 'shortlisted',
-    appliedAt: '2024-04-09',
-    college: 'NIT Trichy',
-    photoUrl: null,
-    resumeUrl: '/mock/resume.pdf',
-    resumeName: 'Priya_Sharma_Resume.pdf',
-  },
-  {
-    id: 3,
-    name: 'Rahul Verma',
-    email: 'rahul@college.edu',
-    domain: 'DSA',
-    score: 45,
-    status: 'rejected',
-    appliedAt: '2024-04-08',
-    college: 'VIT Vellore',
-    photoUrl: null,
-    resumeUrl: null,
-    resumeName: null,
-  },
-  {
-    id: 4,
-    name: 'Sneha Patel',
-    email: 'sneha@college.edu',
-    domain: 'Web',
-    score: 92,
-    status: 'applied',
-    appliedAt: '2024-04-11',
-    college: 'BITS Pilani',
-    phone: '+91 91234 56789',
-    photoUrl: null,
-    resumeUrl: '/mock/resume.pdf',
-    resumeName: 'Sneha_Patel_Resume.pdf',
-  },
-];
+import { useAuth } from '@/components/providers/AuthContext';
+import { applicationsApi, ApiError } from '@/lib/api';
+import { Users, Search, Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type StatusFilter = 'all' | 'applied' | 'shortlisted' | 'rejected';
 
 export default function ApplicantsPage() {
-  const [applicants, setApplicants] = useState<Applicant[]>(MOCK_APPLICANTS);
-  const [search, setSearch]         = useState('');
+  const { accessToken } = useAuth();
+  
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  const handleShortlist = (id: number) => {
-    setApplicants((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: 'shortlisted' } : a))
-    );
+  // Load applicants from API
+  useEffect(() => {
+    const loadApplicants = async () => {
+      if (!accessToken) return;
+      
+      setIsLoading(true);
+      setError('');
+      
+      try {
+        const res = await applicationsApi.getHRApplications(accessToken);
+        
+        // Transform API data to Applicant format
+        const transformed: Applicant[] = res.data.map((app) => ({
+          id: app.id,
+          name: app.student_name,
+          email: app.student_email,
+          domain: app.student_domain,
+          score: app.student_score,
+          status: app.status,
+          appliedAt: app.applied_at,
+          college: app.college || undefined,
+          phone: app.phone || undefined,
+          photoUrl: app.profile_photo_url || null,
+          resumeUrl: app.resume_url || null,
+          resumeName: app.resume_name || null,
+        }));
+        
+        setApplicants(transformed);
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : 'Failed to load applicants.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadApplicants();
+  }, [accessToken]);
+
+  const handleShortlist = async (id: number) => {
+    if (!accessToken) return;
+    
+    try {
+      await applicationsApi.updateStatus(accessToken, id, 'shortlisted');
+      setApplicants((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: 'shortlisted' } : a))
+      );
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to update status.');
+    }
   };
 
-  const handleReject = (id: number) => {
-    setApplicants((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: 'rejected' } : a))
-    );
+  const handleReject = async (id: number) => {
+    if (!accessToken) return;
+    
+    try {
+      await applicationsApi.updateStatus(accessToken, id, 'rejected');
+      setApplicants((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: 'rejected' } : a))
+      );
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to update status.');
+    }
   };
 
   const filtered = applicants.filter((a) => {
@@ -105,6 +106,35 @@ export default function ApplicantsPage() {
     shortlisted: applicants.filter((a) => a.status === 'shortlisted').length,
     rejected:    applicants.filter((a) => a.status === 'rejected').length,
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="p-6 md:p-8 max-w-5xl mx-auto">
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <span className="ml-3 text-muted-foreground">Loading applicants...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="p-6 md:p-8 max-w-5xl mx-auto">
+        <Card className="border-destructive/30">
+          <CardContent className="pt-8 pb-8 text-center space-y-4">
+            <AlertCircle className="w-10 h-10 text-destructive mx-auto" />
+            <p className="font-semibold text-foreground">{error}</p>
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">

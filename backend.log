@@ -273,3 +273,454 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
 [DB] SELECT key, value FROM portal_settings | 716ms | 1 rows
 [0mGET /api/settings [36m304[0m 1324.784 ms - -[0m
 [DB] Pool client error (will reconnect): Connection terminated unexpectedly
+[0mPOST /api/auth/logout [0m-[0m - ms - -[0m
+[DB] UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token_hash = $1 | 4355ms | 1 rows
+[DB] SELECT id FROM users WHERE email = $1 | 362ms | 1 rows
+[ERROR] Error: Email already registered.
+    at createError (/Users/logeshalavandhan/Downloads/placement/backend/src/middleware/error.middleware.ts:39:27)
+    at register (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts:32:30)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  statusCode: 409,
+  isOperational: true
+}
+[0mPOST /api/auth/register [33m409[0m 400.139 ms - 401[0m
+[INFO] 16:16:47 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/users.controller.ts has been modified
+SIGTERM received. Closing database pool...
+(node:87937) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[0mGET /health [32m200[0m 1.115 ms - 61[0m
+[DB] SELECT id, name, email, password, role, domain, score, status,
+              is_ | 350ms | 1 rows
+[DB] UPDATE users
+       SET failed_attempts = 0, locked_until = NULL, last_login_at  | 354ms | 1 rows
+[DB] INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_ag | 491ms | 1 rows
+[0mPOST /api/auth/login [32m200[0m 1479.361 ms - 595[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 292ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status, created_at
+         FROM us | 297ms | 4 rows
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 3692ms | 1 rows
+[DB] SELECT COUNT(*) FROM users  | 3402ms | 1 rows
+[0mGET /api/users? [32m200[0m 3698.605 ms - 725[0m
+[DB] SELECT key, value FROM portal_settings | 303ms | 1 rows
+[0mGET /api/settings [36m304[0m 3997.256 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 308ms | 1 rows
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 291ms | 1 rows
+[DB] SELECT COUNT(*) FROM users  | 365ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status, created_at
+         FROM us | 366ms | 4 rows
+[0mGET /api/users? [36m304[0m 674.727 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 373ms | 1 rows
+[DB] SELECT COUNT(*) FROM jobs j WHERE j.is_active = true | 771ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 406ms | 1 rows
+[0mGET /api/settings [36m304[0m 781.437 ms - -[0m
+[DB] SELECT
+           j.*,
+           u.name  AS hr_name,
+           u.email AS hr_e | 774ms | 2 rows
+[0mGET /api/jobs?page=1&limit=20 [36m304[0m 1068.212 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 401ms | 1 rows
+[DB] SELECT
+           j.*,
+           u.name  AS hr_name,
+           u.email AS hr_e | 298ms | 2 rows
+[DB] SELECT COUNT(*) FROM jobs j WHERE j.is_active = true | 301ms | 1 rows
+[0mGET /api/jobs?page=1&limit=20 [36m304[0m 704.186 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 325ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 457ms | 1 rows
+[0mGET /api/settings [36m304[0m 786.268 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 508ms | 1 rows
+[DB] SELECT key, value FROM portal_settings | 307ms | 1 rows
+[0mGET /api/settings [36m304[0m 818.346 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 359ms | 1 rows
+[DB] SELECT COUNT(*) FROM users  | 353ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status, created_at
+         FROM us | 354ms | 4 rows
+[0mGET /api/users? [36m304[0m 714.728 ms - -[0m
+[DB] SELECT id, email, role, is_active, password_changed_at FROM users WHERE id = $1 | 333ms | 1 rows
+[DB] SELECT COUNT(*) FROM users  | 299ms | 1 rows
+[DB] SELECT id, name, email, role, domain, score, status, created_at
+         FROM us | 308ms | 4 rows
+[0mGET /api/users? [36m304[0m 644.175 ms - -[0m
+[0mGET /api/auth/me [33m401[0m 18.859 ms - 73[0m
+[0mPOST /api/auth/refresh [0m-[0m - ms - -[0m
+[0mPOST /api/auth/login [0m-[0m - ms - -[0m
+[ERROR] Error: read EADDRNOTAVAIL
+    at /Users/logeshalavandhan/Downloads/placement/backend/node_modules/pg-pool/index.js:45:11
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at query (/Users/logeshalavandhan/Downloads/placement/backend/src/config/db.ts:32:20)
+    at refreshToken (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts:154:20) {
+  errno: -49,
+  code: 'EADDRNOTAVAIL',
+  syscall: 'read'
+}
+[ERROR] Error: read EADDRNOTAVAIL
+    at /Users/logeshalavandhan/Downloads/placement/backend/node_modules/pg-pool/index.js:45:11
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at query (/Users/logeshalavandhan/Downloads/placement/backend/src/config/db.ts:32:20)
+    at login (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts:76:20) {
+  errno: -49,
+  code: 'EADDRNOTAVAIL',
+  syscall: 'read'
+}
+[ERROR] Error: read EADDRNOTAVAIL
+    at /Users/logeshalavandhan/Downloads/placement/backend/node_modules/pg-pool/index.js:45:11
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at query (/Users/logeshalavandhan/Downloads/placement/backend/src/config/db.ts:32:20)
+    at login (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts:76:20) {
+  errno: -49,
+  code: 'EADDRNOTAVAIL',
+  syscall: 'read'
+}
+[0mPOST /api/auth/login [31m500[0m 165164.699 ms - 460[0m
+[INFO] 06:44:42 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts has been modified
+SIGTERM received. Closing database pool...
+(node:91282) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[INFO] 06:45:00 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts has been modified
+SIGTERM received. Closing database pool...
+(node:91299) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 06:45:05 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 06:45:12 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/auth.controller.ts has been modified
+(node:91310) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 06:45:19 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 06:53:45 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts has been modified
+(node:91520) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[INFO] 06:54:15 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts has been modified
+SIGTERM received. Closing database pool...
+Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1421:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts:4:1)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1761:14)
+[ERROR] 06:54:15 Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+[INFO] 06:54:23 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts has been modified
+Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1421:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts:4:1)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1761:14)
+[ERROR] 06:54:23 Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+[INFO] 06:54:25 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts has been modified
+Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1421:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (/Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts:4:1)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1761:14)
+[ERROR] 06:54:25 Error: Cannot find module 'xml2js'
+Require stack:
+- /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/routes/tests.routes.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts
+- /Users/logeshalavandhan/Downloads/placement/backend/src/server.ts
+[INFO] 07:53:21 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts has been modified
+(node:6303) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 07:53:26 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 08:40:59 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/tests.controller.ts has been modified
+(node:12114) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 08:41:06 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 09:59:03 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts has been modified
+(node:18100) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 09:59:09 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 10:00:14 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/app.ts has been modified
+(node:18140) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[INFO] 10:02:24 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/testAttempts.controller.ts has been modified
+SIGTERM received. Closing database pool...
+(node:18864) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 10:02:29 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 10:13:40 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/testAttempts.controller.ts has been modified
+(node:19912) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[INFO] 10:13:54 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/testAttempts.controller.ts has been modified
+SIGTERM received. Closing database pool...
+(node:19931) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 10:14:00 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 10:14:22 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/codingReview.controller.ts has been modified
+(node:19957) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
+[INFO] 11:09:18 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/config/db.ts has been modified
+(node:21265) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 11:09:23 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 11:09:29 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/config/db.ts has been modified
+(node:21287) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 11:09:35 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 11:53:05 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/controllers/applications.controller.ts has been modified
+(node:23151) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at app.listen (/Users/logeshalavandhan/Downloads/placement/backend/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/logeshalavandhan/Downloads/placement/backend/src/server.ts:12:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ERROR] 11:53:09 Error: listen EADDRINUSE: address already in use :::5000
+[INFO] 11:53:38 Restarting: /Users/logeshalavandhan/Downloads/placement/backend/src/routes/applications.routes.ts has been modified
+(node:23190) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✅ Database connected (Neon PostgreSQL)
+🚀 Server running on http://localhost:5000
+📋 Environment: development
